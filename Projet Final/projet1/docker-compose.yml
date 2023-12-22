@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  wordpress:
+    image: garavou24/wp-rep:latest
+    ports:
+      - "9000:80"
+    networks:
+      - frontend_network
+      - backend_network
+    environment:
+      - WORDPRESS_DB_HOST=db:7000
+      - WORDPRESS_DB_NAME=db_wp
+
+  db:
+    image: mariadb:latest
+    networks:
+      - backend_network
+    volumes:
+      - ./my.cnf:/home/jad/JadSalloum_MonaliPatel/my.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_DATABASE=db_wp
+
+networks:
+  frontend_network:
+  backend_network:

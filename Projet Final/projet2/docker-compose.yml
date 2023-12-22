@@ -1,0 +1,58 @@
+version: '3'
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
+    container_name: es01
+    volumes:
+      - ./es-cluster:/usr/share/elasticsearch/config
+    environment:
+      - node.name=es01
+      - cluster.name=my-cluster
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+    ports:
+      - "9200:9200"
+    networks:
+      - my-network
+
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
+    container_name: es02
+    volumes:
+      - ./es-cluster:/usr/share/elasticsearch/config
+    environment:
+      - node.name=es02
+      - cluster.name=my-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+    networks:
+      - my-network
+
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
+    container_name: es03
+    volumes:
+      - ./es-cluster:/usr/share/elasticsearch/config
+    environment:
+      - node.name=es03
+      - cluster.name=my-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+    networks:
+      - my-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ES_VERSION}
+    container_name: kibana
+    volumes:
+      - ./es-cluster:/usr/share/elasticsearch/config
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
